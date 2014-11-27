@@ -18,6 +18,15 @@ func (t *NullTime) UnmarshalText(text []byte) error {
 	return t.Time.UnmarshalText(text)
 }
 
+func (t *NullTime) UnmarshalJSON(data []byte) error {
+	text := string(data)
+	if text == "null" || text == `""` {
+		t.Valid = false
+		return nil
+	}
+	return t.UnmarshalText(data)
+}
+
 func (t *NullTime) Scan(src interface{}) error {
 	switch x := src.(type) {
 	case []byte:
@@ -26,7 +35,7 @@ func (t *NullTime) Scan(src interface{}) error {
 			return nil
 		}
 	case string:
-		if x == "" || str == "null" {
+		if x == "" || x == "null" {
 			t.Valid = false
 			return nil
 		}
@@ -42,6 +51,22 @@ func (t NullTime) MarshalText() (text []byte, err error) {
 		return []byte{}, nil
 	}
 	return t.Time.MarshalText()
+}
+
+func (t NullTime) MarshalJSON() ([]byte, error) {
+	if !t.Valid {
+		return []byte("null"), nil
+	}
+	text, err := t.MarshalText()
+	if err != nil {
+		return nil, err
+	}
+	// what is the best way to do this?
+	out := make([]byte, 0, len(text)+2)
+	out = append(out, '"')
+	out = append(out, text...)
+	out = append(out, '"')
+	return out, nil
 }
 
 func (t NullTime) Value() (driver.Value, error) {
