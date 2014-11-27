@@ -62,3 +62,11 @@ func ParseTime(text string) (Time, error) {
 	err := t.UnmarshalText([]byte(text))
 	return *t, err
 }
+
+func MustParseTime(text string) Time {
+	t, err := ParseTime(text)
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
