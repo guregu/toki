@@ -20,15 +20,13 @@ func (t *NullTime) UnmarshalText(text []byte) error {
 
 func (t *NullTime) Scan(src interface{}) error {
 	switch x := src.(type) {
-	// TODO: see if we really need all this
-	// []byte and string are probably unnecessary
 	case []byte:
 		if len(x) == 0 {
 			t.Valid = false
 			return nil
 		}
 	case string:
-		if x == "" {
+		if x == "" || str == "null" {
 			t.Valid = false
 			return nil
 		}
@@ -41,7 +39,7 @@ func (t *NullTime) Scan(src interface{}) error {
 
 func (t NullTime) MarshalText() (text []byte, err error) {
 	if !t.Valid {
-		return []byte("null"), nil
+		return []byte{}, nil
 	}
 	return t.Time.MarshalText()
 }
