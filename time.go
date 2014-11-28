@@ -50,11 +50,19 @@ func (t *Time) Scan(src interface{}) error {
 }
 
 func (t Time) MarshalText() (text []byte, err error) {
+	if t.Seconds == 0 {
+		return []byte(fmt.Sprintf("%02d:%02d", t.Hours, t.Minutes)), nil
+	}
 	return []byte(fmt.Sprintf("%02d:%02d:%02d", t.Hours, t.Minutes, t.Seconds)), nil
 }
 
 func (t Time) Value() (driver.Value, error) {
 	return t.MarshalText()
+}
+
+func (t Time) String() string {
+	text, _ := t.MarshalText()
+	return string(text)
 }
 
 func ParseTime(text string) (Time, error) {
