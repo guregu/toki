@@ -8,11 +8,12 @@ import (
 	"time"
 )
 
+// Time represents an SQL TIME value.
 type Time struct {
 	Hours   int
 	Minutes int
 	Seconds int
-	// TODO: millis?
+	// TODO: millis? is that MySQL only?
 }
 
 func (t *Time) UnmarshalText(text []byte) error {
@@ -34,6 +35,7 @@ func (t *Time) UnmarshalText(text []byte) error {
 	return nil
 }
 
+// Value implements the driver Scanner interface.
 func (t *Time) Scan(src interface{}) error {
 	switch x := src.(type) {
 	case []byte:
@@ -49,6 +51,8 @@ func (t *Time) Scan(src interface{}) error {
 	return fmt.Errorf("unsupported type: %T", src)
 }
 
+// MarshalText implements the encoding TextMarshaler interface.
+// Encodes to hh:mm:ss and omits the seconds if 0.
 func (t Time) MarshalText() (text []byte, err error) {
 	if t.Seconds == 0 {
 		return []byte(fmt.Sprintf("%02d:%02d", t.Hours, t.Minutes)), nil
@@ -56,21 +60,25 @@ func (t Time) MarshalText() (text []byte, err error) {
 	return []byte(fmt.Sprintf("%02d:%02d:%02d", t.Hours, t.Minutes, t.Seconds)), nil
 }
 
+// Value implements the driver Valuer interface.
 func (t Time) Value() (driver.Value, error) {
 	return t.MarshalText()
 }
 
+// String returns a string representation of this Time.
 func (t Time) String() string {
 	text, _ := t.MarshalText()
 	return string(text)
 }
 
+// ParseTime tries to parse the given time.
 func ParseTime(text string) (Time, error) {
 	t := &Time{}
 	err := t.UnmarshalText([]byte(text))
 	return *t, err
 }
 
+// MustParseTime parses the given time or panics.
 func MustParseTime(text string) Time {
 	t, err := ParseTime(text)
 	if err != nil {

@@ -4,11 +4,14 @@ import (
 	"database/sql/driver"
 )
 
+// NullTime is a nullable Time.
 type NullTime struct {
 	Time
 	Valid bool
 }
 
+// UnmarshalText implements the encoding TextUnmarshaler interface.
+// Empty strings and "null" will be considered null.
 func (t *NullTime) UnmarshalText(text []byte) error {
 	t.Valid = true
 	str := string(text)
@@ -19,6 +22,8 @@ func (t *NullTime) UnmarshalText(text []byte) error {
 	return t.Time.UnmarshalText(text)
 }
 
+// UnmarshalJSON implements the JSON Unmarshaler interface.
+// Empty strings and "null" will be considered null.
 func (t *NullTime) UnmarshalJSON(data []byte) error {
 	t.Valid = true
 	text := string(data)
@@ -29,6 +34,7 @@ func (t *NullTime) UnmarshalJSON(data []byte) error {
 	return t.UnmarshalText(data[1 : len(data)-1])
 }
 
+// Value implements the driver Scanner interface.
 func (t *NullTime) Scan(src interface{}) error {
 	t.Valid = true
 	switch x := src.(type) {
@@ -49,6 +55,9 @@ func (t *NullTime) Scan(src interface{}) error {
 	return t.Time.Scan(src)
 }
 
+// MarshalText implements the encoding TextMarshaler interface.
+// Encodes to hh:mm:ss and omits the seconds if 0.
+// Encodes to an empty string if null.
 func (t NullTime) MarshalText() (text []byte, err error) {
 	if !t.Valid {
 		return []byte{}, nil
@@ -56,6 +65,9 @@ func (t NullTime) MarshalText() (text []byte, err error) {
 	return t.Time.MarshalText()
 }
 
+// MarshalJSON implements the JSON Marshaler interface.
+// Encodes to hh:mm:ss and omits the seconds if 0.
+// Encodes to null if null.
 func (t NullTime) MarshalJSON() ([]byte, error) {
 	if !t.Valid {
 		return []byte("null"), nil
@@ -69,6 +81,7 @@ func (t NullTime) MarshalJSON() ([]byte, error) {
 	return out, nil
 }
 
+// Value implements the driver Valuer interface.
 func (t NullTime) Value() (driver.Value, error) {
 	if !t.Valid {
 		return nil, nil
@@ -76,17 +89,20 @@ func (t NullTime) Value() (driver.Value, error) {
 	return t.Time.MarshalText()
 }
 
+// String returns a string representation of this Time.
 func (t NullTime) String() string {
 	text, _ := t.MarshalText()
 	return string(text)
 }
 
+// ParseNullTime tries to parse the given time.
 func ParseNullTime(text string) (NullTime, error) {
 	t := &NullTime{}
 	err := t.UnmarshalText([]byte(text))
 	return *t, err
 }
 
+// MustParseNullTime parses the given time or panics.
 func MustParseNullTime(text string) NullTime {
 	t, err := ParseNullTime(text)
 	if err != nil {
