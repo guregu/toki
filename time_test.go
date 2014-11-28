@@ -11,6 +11,7 @@ var parseTable = map[string]string{
 	"12:34:56": "12:34:56",
 	"12:34":    "12:34",
 	"12":       "12:00",
+	"1":        "1:00",
 }
 
 func TestParseTime(t *testing.T) {
@@ -86,7 +87,7 @@ func TestScan(t *testing.T) {
 	errTime := toki.Time{}
 	err = errTime.Scan(42)
 	if err == nil {
-		t.Errorf("ParseTime: expected error, got: nil")
+		t.Errorf("Scan: expected error, got: nil")
 	}
 }
 

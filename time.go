@@ -55,9 +55,9 @@ func (t *Time) Scan(src interface{}) error {
 // Encodes to hh:mm:ss and omits the seconds if 0.
 func (t Time) MarshalText() (text []byte, err error) {
 	if t.Seconds == 0 {
-		return []byte(fmt.Sprintf("%02d:%02d", t.Hours, t.Minutes)), nil
+		return []byte(fmt.Sprintf("%d:%02d", t.Hours, t.Minutes)), nil
 	}
-	return []byte(fmt.Sprintf("%02d:%02d:%02d", t.Hours, t.Minutes, t.Seconds)), nil
+	return []byte(fmt.Sprintf("%d:%02d:%02d", t.Hours, t.Minutes, t.Seconds)), nil
 }
 
 // Value implements the driver Valuer interface.
