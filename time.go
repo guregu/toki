@@ -1,6 +1,7 @@
 package toki
 
 import (
+	"bytes"
 	"database/sql/driver"
 	"fmt"
 	"strconv"
@@ -13,11 +14,12 @@ type Time struct {
 	Hours   int
 	Minutes int
 	Seconds int
-	// TODO: millis? is that MySQL only?
 }
 
+// UnmarshalText implements the encoding TextUnmarshaler interface.
 func (t *Time) UnmarshalText(text []byte) error {
 	parts := strings.Split(string(text), ":")
+loop:
 	for i, p := range parts {
 		n, err := strconv.Atoi(p)
 		if err != nil {
@@ -30,6 +32,8 @@ func (t *Time) UnmarshalText(text []byte) error {
 			t.Minutes = n
 		case 2:
 			t.Seconds = n
+		default:
+			break loop
 		}
 	}
 	return nil
@@ -54,10 +58,21 @@ func (t *Time) Scan(src interface{}) error {
 // MarshalText implements the encoding TextMarshaler interface.
 // Encodes to hh:mm:ss and omits the seconds if 0.
 func (t Time) MarshalText() (text []byte, err error) {
-	if t.Seconds == 0 {
-		return []byte(fmt.Sprintf("%d:%02d", t.Hours, t.Minutes)), nil
+	var buf bytes.Buffer
+	buf.WriteString(strconv.Itoa(t.Hours))
+	buf.WriteByte(':')
+	if t.Minutes < 10 {
+		buf.WriteByte('0')
 	}
-	return []byte(fmt.Sprintf("%d:%02d:%02d", t.Hours, t.Minutes, t.Seconds)), nil
+	buf.WriteString(strconv.Itoa(t.Minutes))
+	if t.Seconds != 0 {
+		buf.WriteByte(':')
+		if t.Seconds < 10 {
+			buf.WriteByte('0')
+		}
+		buf.WriteString(strconv.Itoa(t.Seconds))
+	}
+	return buf.Bytes(), nil
 }
 
 // Value implements the driver Valuer interface.

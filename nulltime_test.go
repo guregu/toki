@@ -10,7 +10,6 @@ import (
 var jsonTable = map[string]string{
 	`"12:34"`: `"12:34"`,
 	`""`:      "null",
-	"null":    "null",
 }
 
 func TestMarshalNullJSON(t *testing.T) {
@@ -118,5 +117,40 @@ func TestNullValue(t *testing.T) {
 	}
 	if err != nil {
 		t.Errorf("Value: error: %v", err)
+	}
+}
+
+func BenchmarkNull(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		t := toki.NullTime{}
+		t.UnmarshalJSON([]byte{'n', 'u', 'l', 'l'})
+	}
+}
+
+func BenchmarkNormalTime(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		t := toki.NullTime{}
+		t.UnmarshalJSON([]byte{'1', '2', ':', '3', '0'})
+	}
+}
+
+func BenchmarkEmptyTime(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		t := toki.NullTime{}
+		t.UnmarshalJSON([]byte{'"', '"'})
+	}
+}
+
+func BenchmarkMarshal(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		t := toki.NullTime{toki.Time{12, 34, 00}, true}
+		t.MarshalJSON()
+	}
+}
+
+func BenchmarkMarshalNull(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		t := toki.NullTime{toki.Time{}, false}
+		t.MarshalJSON()
 	}
 }
