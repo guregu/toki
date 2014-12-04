@@ -8,10 +8,12 @@ import (
 )
 
 var parseTable = map[string]string{
-	"12:34:56": "12:34:56",
-	"12:34":    "12:34",
-	"12":       "12:00",
-	"1":        "1:00",
+	"12:34:56:7890": "12:34:56", // extra bits are ignored
+	"12:34:56":      "12:34:56",
+	"12:34:01":      "12:34:01",
+	"12:34":         "12:34",
+	"12":            "12:00",
+	"1":             "1:00",
 }
 
 func TestParseTime(t *testing.T) {
@@ -99,5 +101,18 @@ func TestValue(t *testing.T) {
 	}
 	if err != nil {
 		t.Errorf("Value: error: %v", err)
+	}
+}
+
+func TestEquals(t *testing.T) {
+	same1 := toki.MustParseTime("12:34")
+	same2 := toki.MustParseTime("12:34")
+	if !same1.Equals(same2) {
+		t.Error(same1.String(), "≠", same2.String())
+	}
+
+	diff := toki.MustParseTime("12:35")
+	if same1.Equals(diff) {
+		t.Error(same1.String(), "=", diff.String())
 	}
 }

@@ -86,6 +86,14 @@ func (t Time) String() string {
 	return string(text)
 }
 
+// Equals returns true if this Time and the given Time are equal.
+// If they are both null it will return true.
+func (t Time) Equals(other Time) bool {
+	return t.Hours == other.Hours &&
+		t.Minutes == other.Minutes &&
+		t.Seconds == other.Seconds
+}
+
 // ParseTime tries to parse the given time.
 func ParseTime(text string) (Time, error) {
 	t := &Time{}

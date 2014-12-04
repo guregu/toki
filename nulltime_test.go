@@ -120,6 +120,31 @@ func TestNullValue(t *testing.T) {
 	}
 }
 
+func TestNullEquals(t *testing.T) {
+	same1 := toki.MustParseNullTime("12:34")
+	same2 := toki.MustParseNullTime("12:34")
+	if !same1.Equals(same2) {
+		t.Error(same1.String(), "≠", same2.String())
+	}
+
+	diff := toki.MustParseNullTime("12:35")
+	if same1.Equals(diff) {
+		t.Error(same1.String(), "=", diff.String())
+	}
+
+	blankNull := toki.MustParseNullTime("")
+	nullWithTime := toki.MustParseNullTime("12:34")
+	nullWithTime.Valid = false
+
+	if !blankNull.Equals(nullWithTime) {
+		t.Error(blankNull.String(), "≠", nullWithTime.String())
+	}
+
+	if same1.Equals(nullWithTime) {
+		t.Error(blankNull.String(), "=", nullWithTime.String())
+	}
+}
+
 func BenchmarkNull(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		t := toki.NullTime{}

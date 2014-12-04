@@ -95,6 +95,18 @@ func (t NullTime) String() string {
 	return string(text)
 }
 
+// Equals returns true if this Time and the given Time are equal.
+// If they are both null it will return true.
+func (t NullTime) Equals(other NullTime) bool {
+	switch {
+	case !t.Valid && !other.Valid:
+		return true
+	case t.Valid != other.Valid:
+		return false
+	}
+	return t.Time.Equals(other.Time)
+}
+
 // ParseNullTime tries to parse the given time.
 func ParseNullTime(text string) (NullTime, error) {
 	t := &NullTime{}
