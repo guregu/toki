@@ -34,7 +34,7 @@ func (t *NullTime) UnmarshalJSON(data []byte) error {
 	return t.UnmarshalText(data[1 : len(data)-1])
 }
 
-// Value implements the driver Scanner interface.
+// Scan implements the driver Scanner interface.
 func (t *NullTime) Scan(src interface{}) error {
 	t.Valid = true
 	switch x := src.(type) {

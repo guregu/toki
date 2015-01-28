@@ -39,7 +39,7 @@ loop:
 	return nil
 }
 
-// Value implements the driver Scanner interface.
+// Scan implements the driver Scanner interface.
 func (t *Time) Scan(src interface{}) error {
 	switch x := src.(type) {
 	case []byte:

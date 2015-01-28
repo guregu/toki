@@ -168,7 +168,12 @@ func BenchmarkEmptyTime(b *testing.B) {
 
 func BenchmarkMarshal(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		t := toki.NullTime{toki.Time{12, 34, 00}, true}
+		t := toki.NullTime{
+			toki.Time{
+				Hours:   12,
+				Minutes: 34,
+				Seconds: 00,
+			}, true}
 		t.MarshalJSON()
 	}
 }
